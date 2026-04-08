@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"leetboard/internal/adapters/handler"
 	"net/http"
 	"os"
 )
@@ -11,10 +12,6 @@ import (
 var PORT int = 8080
 var SERVER string = "127.0.0.1"
 var USAGEMSG string = "$ ./1337b04rd --help\nhacker board\n\nUsage:\n\t1337b04rd [--port <N>]\n\t1337b04rd --help\n\nOptions:\n\t--help       Show this screen.\n\t--port N     Port number."
-
-func Base(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "hello world")
-}
 
 func main() {
 	// Flags
@@ -34,7 +31,9 @@ func main() {
 
 	// Mux
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", Base)
+	mux.HandleFunc("/catalog", handler.Catalog)
+	mux.HandleFunc("/create-post", handler.CreatePost)
+	mux.HandleFunc("/archive", handler.Archive)
 
 	addr := fmt.Sprintf("%s:%d", SERVER, *port)
 	fmt.Printf("Starting the server on port: %d\n", *port)
