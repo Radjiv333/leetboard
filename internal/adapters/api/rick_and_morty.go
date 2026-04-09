@@ -57,16 +57,16 @@ func FetchRickAndMortyCharacters() ([]RickAndMortyCharacters, RickAndMortyInfo) 
 			fmt.Println("could not unmarshal body:", err)
 			os.Exit(2)
 		}
-		fmt.Println(response.Results)
+
 		allCharacters = append(allCharacters, response.Results...)
-		if response.Info.NextURL != nil {
+		if *response.Info.NextURL != "https://rickandmortyapi.com/api/character?page=2" { // Restraining to loading only 2 pages. Otherwise should be != nil
 			url = *response.Info.NextURL
 		} else {
 			info = response.Info
 			url = ""
 			break
 		}
-		time.Sleep(500 * time.Millisecond) // Introduced delay so that we dont overwhelm the 'ram' api server
+		// time.Sleep(500 * time.Millisecond) // Introduced delay so that we dont overwhelm the 'ram' api server
 	}
 	return allCharacters, info
 }

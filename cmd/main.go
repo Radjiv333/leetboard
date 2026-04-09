@@ -11,7 +11,7 @@ import (
 )
 
 var PORT int = 8080
-var SERVER string = "127.0.0.1"
+var SERVER string = "0.0.0.0"
 var USAGEMSG string = "$ ./1337b04rd --help\nhacker board\n\nUsage:\n\t1337b04rd [--port <N>]\n\t1337b04rd --help\n\nOptions:\n\t--help       Show this screen.\n\t--port N     Port number."
 
 func main() {
@@ -31,10 +31,12 @@ func main() {
 	}
 
 	// Rick And Morty API
+	fmt.Println("Loading characters from API...")
 	rickAndMortyCharacters, rickAndMortyInfo := api.FetchRickAndMortyCharacters()
 	fmt.Println(rickAndMortyCharacters)
 	fmt.Println(rickAndMortyInfo)
 
+	
 	// Mux
 	mux := http.NewServeMux()
 	mux.HandleFunc("/catalog", handler.Catalog)
