@@ -35,6 +35,7 @@ func main() {
 	mux.HandleFunc("/create-post", handler.CreatePost)
 	mux.HandleFunc("/archive", handler.Archive)
 
+	// Server
 	addr := fmt.Sprintf("%s:%d", SERVER, *port)
 	fmt.Printf("Starting the server on port: %d\n", *port)
 	http.ListenAndServe(addr, mux)

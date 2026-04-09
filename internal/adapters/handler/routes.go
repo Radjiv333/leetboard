@@ -2,12 +2,14 @@ package handler
 
 import (
 	"fmt"
+	"leetboard/internal/adapters/middleware"
 	"net/http"
 	"os"
 	"text/template"
 )
 
 func Catalog(w http.ResponseWriter, r *http.Request) {
+	middleware.CheckCookie(w, r)
 	templ, err := template.ParseFiles("templates/catalog.html")
 	if err != nil {
 		fmt.Println("error parsing templates:", err)
@@ -21,6 +23,7 @@ func Catalog(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	middleware.CheckCookie(w, r)
 	templ, err := template.ParseFiles("templates/create-post.html")
 	if err != nil {
 		fmt.Println("error parsing templates:", err)
@@ -34,6 +37,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func Archive(w http.ResponseWriter, r *http.Request) {
+	middleware.CheckCookie(w, r)
 	templ, err := template.ParseFiles("templates/archive.html")
 	if err != nil {
 		fmt.Println("error parsing templates:", err)
