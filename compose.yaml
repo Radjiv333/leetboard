@@ -1,0 +1,14 @@
+services:
+  leetboard: 
+    build: .
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - triple-s
+
+
+  triple-s:
+    image: triple-s:latest
+    build: ../triple-s
+    ports: 
+    - "8081:8081"

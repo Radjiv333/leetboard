@@ -11,7 +11,7 @@ import (
 )
 
 var PORT int = 8080
-var SERVER string = "0.0.0.0"
+var SERVER string = "0.0.0.0" // Docker container now uses all available interfaces
 var USAGEMSG string = "$ ./1337b04rd --help\nhacker board\n\nUsage:\n\t1337b04rd [--port <N>]\n\t1337b04rd --help\n\nOptions:\n\t--help       Show this screen.\n\t--port N     Port number."
 
 func main() {
