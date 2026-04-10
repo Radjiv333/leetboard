@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -30,31 +30,29 @@ func FetchRickAndMortyCharacters() ([]RickAndMortyCharacters, RickAndMortyInfo) 
 	url := "https://rickandmortyapi.com/api/character"
 	client := &http.Client{Timeout: 10 * time.Second} // Use http.Client instead of http.Get to configure the connection settings (like timeout)
 	var allCharacters []RickAndMortyCharacters
-	var info RickAndMortyInfo
+	response := RickAndMortyResponse{}
 	for url != "" {
 		resp, err := client.Get(url)
+		slog.Debug("response status code check", "status code", resp.Status)
 		if err != nil {
-			fmt.Println("could not get rick_and_morty api:", err)
+			slog.Error("Could not get rick_and_morty api", "error", err.Error())
+			os.Exit(2)
+		}
+		if resp.StatusCode != http.StatusOK {
+			slog.Error("Could not get rick_and_morty api. Invalid status code", "status code", resp.Status)
 			os.Exit(2)
 		}
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Println("could not read response body:", err)
+			slog.Error("Could not read response body", "error", err.Error())
 			os.Exit(2)
 		}
 		defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
-			fmt.Println("unexpected status:", resp.Status)
-			fmt.Println("body:", string(body))
-			os.Exit(2)
-		}
-
-		response := RickAndMortyResponse{}
 		err = json.Unmarshal(body, &response)
 		if err != nil {
-			fmt.Println("could not unmarshal body:", err)
+			slog.Error("Could not unmarshal body", "error", err.Error())
 			os.Exit(2)
 		}
 
@@ -62,11 +60,10 @@ func FetchRickAndMortyCharacters() ([]RickAndMortyCharacters, RickAndMortyInfo) 
 		if *response.Info.NextURL != "https://rickandmortyapi.com/api/character?page=2" { // Restraining to loading only 2 pages. Otherwise should be != nil
 			url = *response.Info.NextURL
 		} else {
-			info = response.Info
 			url = ""
 			break
 		}
 		// time.Sleep(500 * time.Millisecond) // Introduced delay so that we dont overwhelm the 'ram' api server
 	}
-	return allCharacters, info
+	return allCharacters, response.Info
 }
