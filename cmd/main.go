@@ -6,6 +6,7 @@ import (
 	"io"
 	"leetboard/internal/adapters/api"
 	"leetboard/internal/adapters/handler"
+	"leetboard/internal/adapters/s3"
 	"log/slog"
 	"net/http"
 	"os"
@@ -27,7 +28,7 @@ func main() {
 	help := flagSet.Bool("help", false, "shows usage of the program")
 	err := flagSet.Parse(os.Args[1:])
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error("Could not parse arguments", "error", err.Error())
 		os.Exit(2)
 	}
 	if *help == true {
@@ -37,10 +38,18 @@ func main() {
 
 	// Rick And Morty API
 	slog.Info("Loading characters from API...")
-	// rickAndMortyCharacters, rickAndMortyInfo := api.FetchRickAndMortyCharacters()
-	api.FetchRickAndMortyCharacters()
-	// fmt.Println(rickAndMortyCharacters)
-	// fmt.Println(rickAndMortyInfo)
+	apiLogger := logger.With(slog.String("service", "api"))
+	rickAndMortyCharacters, rickAndMortyInfo := api.FetchRickAndMortyCharacters(apiLogger)
+	// api.FetchRickAndMortyCharacters()
+	fmt.Println(rickAndMortyCharacters)
+	fmt.Println(rickAndMortyInfo)
+
+	// S3
+	s3Logger := logger.With(slog.String("service", "s3")) // Created s3 logger that will have "service":"s3" even if i dont write it explicitly
+	err = s3.UploadImages(rickAndMortyCharacters, s3Logger)
+	if err != nil {
+		slog.Error(err.Error())
+	}
 
 	// Mux
 	mux := http.NewServeMux()

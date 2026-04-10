@@ -26,38 +26,38 @@ type RickAndMortyInfo struct {
 	NextURL *string `json:"next"`
 }
 
-func FetchRickAndMortyCharacters() ([]RickAndMortyCharacters, RickAndMortyInfo) {
+func FetchRickAndMortyCharacters(logger *slog.Logger) ([]RickAndMortyCharacters, RickAndMortyInfo) {
 	url := "https://rickandmortyapi.com/api/character"
 	client := &http.Client{Timeout: 10 * time.Second} // Use http.Client instead of http.Get to configure the connection settings (like timeout)
 	var allCharacters []RickAndMortyCharacters
 	response := RickAndMortyResponse{}
 	for url != "" {
 		resp, err := client.Get(url)
-		slog.Debug("response status code check", "status code", resp.Status)
+		logger.Debug("response status code check", "status code", resp.Status)
 		if err != nil {
-			slog.Error("Could not get rick_and_morty api", "error", err.Error())
+			logger.Error("Could not get rick_and_morty api", "error", err.Error())
 			os.Exit(2)
 		}
 		if resp.StatusCode != http.StatusOK {
-			slog.Error("Could not get rick_and_morty api. Invalid status code", "status code", resp.Status)
+			logger.Error("Could not get rick_and_morty api. Invalid status code", "status code", resp.Status)
 			os.Exit(2)
 		}
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			slog.Error("Could not read response body", "error", err.Error())
+			logger.Error("Could not read response body", "error", err.Error())
 			os.Exit(2)
 		}
 		defer resp.Body.Close()
 
 		err = json.Unmarshal(body, &response)
 		if err != nil {
-			slog.Error("Could not unmarshal body", "error", err.Error())
+			logger.Error("Could not unmarshal body", "error", err.Error())
 			os.Exit(2)
 		}
 
 		allCharacters = append(allCharacters, response.Results...)
-		if *response.Info.NextURL != "https://rickandmortyapi.com/api/character?page=2" { // Restraining to loading only 2 pages. Otherwise should be != nil
+		if *response.Info.NextURL != "https://rickandmortyapi.com/api/character?page=2" { // Restraining to loading only 1 page. Otherwise should be != nil
 			url = *response.Info.NextURL
 		} else {
 			url = ""
